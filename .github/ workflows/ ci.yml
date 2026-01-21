@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, fix/hardening-deploy-syntaxial ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [18]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Install root deps
+        run: npm ci
+      - name: Install admin deps and build
+        run: |
+          if [ -d "./admin" ]; then
+            cd admin
+            npm ci
+            npm run build
+            cd ..
+          else
+            echo "No admin dir, skipping admin build"
+          fi
+      - name: Prisma generate
+        run: npx prisma generate || true
+      - name: Run lint (optional)
+        run: npm run lint || true

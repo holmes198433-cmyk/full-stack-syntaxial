@@ -14,7 +14,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const cors = require('cors');
 
-const { syncSchema } = require('./app/services/schema.server'); // commonjs require for server entrypoint
+const { syncSchema } = require('./app/services.schema.server'); // commonjs require for server entrypoint
 const shopify = require('./app/shopify.server').default; // for webhooks maybe used later
 
 const app = express();

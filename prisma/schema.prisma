@@ -1,0 +1,24 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model schemaDefinition {
+  id          Int      @id @default(autoincrement())
+  shop        String
+  ownerType   String
+  key         String
+  name        String?
+  type        String?
+  description String?
+  lastAudited DateTime? @updatedAt
+  createdAt   DateTime  @default(now())
+
+  @@unique([shop, ownerType, key], name: "shop_ownerType_key")
+  @@map("schema_definitions")
+}
