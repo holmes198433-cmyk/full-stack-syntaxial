@@ -53,10 +53,14 @@ app.post('/admin/sync-schema', async (req, res) => {
       return res.status(403).json({ error: 'Forbidden' });
     }
 
-    // In a full Remix app, you'd call syncSchema(request) where request is Remixed; here we call a simplified path
-    // If using shopifyApp remixed server, prefer to wire authenticate.admin and call syncSchema with the Remix request.
-    // For now, run a basic response: caller should trigger sync via the Remix admin flow.
-    return res.json({ status: 'ok', message: 'Use the Remix admin route to sync via Shopify authentication.' });
+    // Build a Fetch API Request to satisfy shopify.authenticate.admin requirements.
+    const remixRequest = new Request(`${process.env.SHOPIFY_APP_URL || 'http://localhost:3000'}${req.originalUrl}`, {
+      method: req.method,
+      headers: new Headers(req.headers),
+    });
+
+    const result = await syncSchema(remixRequest);
+    return res.json({ status: 'ok', ...result });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: 'sync failed' });
